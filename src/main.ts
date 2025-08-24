@@ -29,6 +29,8 @@ const CHALLENGE_PUZZLE: SudokuGrid = [
   [0, 0, 0, 0, 8, 0, 0, 7, 9],
 ];
 
+const MODULUS = 21888242871839275222246405745257275088548364400416034343698204186575808495617n;
+
 class PseudokuGame implements Partial<GameState> {
   grid: SudokuGrid = [];
   fixedCells: boolean[][] = [];
@@ -110,15 +112,19 @@ class PseudokuGame implements Partial<GameState> {
   }
   
   private generateFieldElement(): FieldElement {
-    // Generate a random field element (32 bytes)
-    const bytes = new Uint8Array(32);
-    crypto.getRandomValues(bytes);
-    // Convert to hex string
-    const hex = Array.from(bytes)
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
-    // Convert to field element (as a string to avoid precision issues)
-    return '0x' + hex;
+    const bytes = new Uint8Array(32); // 256 bits
+    let rand;
+    for (;;) {
+        crypto.getRandomValues(bytes);
+        bytes[0] &= 0x3f; // mask top 2 bits → 254-bit candidate
+        let x = 0n;
+        for (let i = 0; i < bytes.length; i++) x = (x << 8n) | BigInt(bytes[i]);
+        if (x < MODULUS) {
+            rand = x;
+            break;
+        }
+    }
+    return rand.toString();
   }
   
   private initializeGame(): void {
