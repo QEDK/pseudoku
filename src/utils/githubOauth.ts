@@ -38,7 +38,7 @@ export class GitHubOAuth {
     // because it requires the client secret, which should never be exposed
     // to the client-side code
     
-    const backendUrl = import.meta.env.VITE_API_ENDPOINT;
+    const backendUrl = import.meta.env.OAUTH_API_ENDPOINT;
     
     if (!backendUrl) {
       throw new Error('Backend server not configured for OAuth');

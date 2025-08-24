@@ -1,9 +1,8 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_GITHUB_TOKEN?: string;
-  readonly VITE_API_ENDPOINT?: string;
-  readonly VITE_ANALYTICS_ID?: string;
+  readonly GITHUB_CLIENT_ID?: string;
+  readonly OAUTH_API_ENDPOINT?: string;
 }
 
 interface ImportMeta {
