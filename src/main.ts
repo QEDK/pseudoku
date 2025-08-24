@@ -33,7 +33,7 @@ class PseudokuGame implements Partial<GameState> {
   grid: SudokuGrid = [];
   fixedCells: boolean[][] = [];
   startTime: number | null = null;
-  timerInterval: NodeJS.Timeout | null = null;
+  timerInterval: ReturnType<typeof setTimeout> | null = null;
   elapsedTime: number = 0;
   fieldElement: FieldElement;
   proof: ProofData | null = null;
