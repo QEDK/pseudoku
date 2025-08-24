@@ -23,7 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 .DS_Store
-target/
+circuits/target
+!circuits/target/pseudoku.json
 Prover.toml
 node_modules/
 .env
+.wrangler/
