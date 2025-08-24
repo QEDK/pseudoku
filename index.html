@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pseudoku - Zero-Knowledge Sudoku</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .sudoku-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 2px;
+            background: #333;
+            padding: 2px;
+            border-radius: 8px;
+            margin: 0 auto 30px;
+            max-width: 450px;
+            aspect-ratio: 1;
+        }
+
+        .sudoku-cell {
+            background: white;
+            border: none;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            outline: none;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sudoku-cell:hover:not(.fixed) {
+            background: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        .sudoku-cell:focus {
+            background: #e8f4ff;
+            color: #667eea;
+            z-index: 10;
+            box-shadow: 0 0 0 2px #667eea;
+        }
+
+        .sudoku-cell.fixed {
+            background: #f5f5f5;
+            color: #000;
+            font-weight: 700;
+            cursor: default;
+        }
+
+        .sudoku-cell.error {
+            background: #fee;
+            color: #e00;
+        }
+
+        .sudoku-cell.success {
+            background: #efe;
+            color: #0a0;
+        }
+
+        /* Thicker borders for 3x3 boxes */
+        .sudoku-cell:nth-child(3n) {
+            border-right: 2px solid #333;
+        }
+        
+        .sudoku-cell:nth-child(n+19):nth-child(-n+27),
+        .sudoku-cell:nth-child(n+46):nth-child(-n+54) {
+            border-bottom: 2px solid #333;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(102, 126, 234, 0.5);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button.secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .status.info {
+            background: #e3f2fd;
+            color: #1976d2;
+            display: block;
+        }
+
+        .status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            display: block;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+            display: block;
+        }
+
+        .status.loading {
+            background: #fff3e0;
+            color: #e65100;
+            display: block;
+        }
+
+        .proof-display {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .proof-display.show {
+            display: block;
+        }
+
+        .proof-hash {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            color: #666;
+            margin: 10px 0;
+        }
+
+        .share-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #efefef 100%);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .share-section.show {
+            display: block;
+        }
+
+        .share-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .github-token-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .github-token-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .field-element {
+            text-align: center;
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .sudoku-cell {
+                font-size: 1rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pseudoku</h1>
+        <p class="subtitle">Solve Sudoku with Zero-Knowledge Proofs</p>
+        
+        <div class="field-element" id="fieldElement"></div>
+        
+        <div class="timer" id="timer">00:00</div>
+        
+        <div class="sudoku-grid" id="sudokuGrid"></div>
+        
+        <div class="controls">
+            <button id="checkBtn">Check Solution</button>
+            <button id="generateProofBtn" disabled>Generate Proof</button>
+            <button id="resetBtn" class="secondary">Reset</button>
+            <button id="hintBtn" class="secondary">Hint</button>
+        </div>
+        
+        <div class="status" id="status"></div>
+        
+        <div class="proof-display" id="proofDisplay">
+            <h3>Proof Generated!</h3>
+            <p>Your solution has been verified with a zero-knowledge proof.</p>
+            <div class="proof-hash" id="proofHash"></div>
+        </div>
+        
+        <div class="share-section" id="shareSection">
+            <h3>Share Your Achievement</h3>
+            <div class="github-token-input">
+                <input type="password" id="githubToken" placeholder="GitHub Personal Access Token (optional)">
+                <button id="uploadGistBtn">Upload to Gist</button>
+            </div>
+            <button id="shareTwitterBtn">Share on X</button>
+        </div>
+    </div>
+    
+    <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
