@@ -1,28 +1,4 @@
-.sudoku-cell.focused {
-            background: #e3f2fd !important;
-            box-shadow: 0 0 0 2px #2196f3;
-            z-index: 10;
-        }
-
-        .sudoku-cell.related {
-            background: #f5f5f5;
-        }        .github-token-input {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .github-token-input input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-
-        #manualGistSection {
-            display: none;
-        }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -147,6 +123,32 @@
         .sudoku-cell:nth-child(n+19):nth-child(-n+27),
         .sudoku-cell:nth-child(n+46):nth-child(-n+54) {
             border-bottom: 2px solid #333;
+        }
+
+        .sudoku-cell.focused {
+            background: #e3f2fd !important;
+            box-shadow: 0 0 0 2px #2196f3;
+            z-index: 10;
+        }
+
+        .sudoku-cell.related {
+            background: #f5f5f5;
+        }        .github-token-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .github-token-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        #manualGistSection {
+            display: none;
         }
 
         .controls {

@@ -131,7 +131,7 @@ class PseudokuGame implements Partial<GameState> {
     // Display field element
     const fieldElementText = document.getElementById('fieldElementText');
     if (fieldElementText) {
-      fieldElementText.textContent = `Your unique field: ${this.fieldElement.slice(0, 10)}...${this.fieldElement.slice(-8)}`;
+      fieldElementText.textContent = `Challenge ID: ${this.fieldElement.slice(0, 10)}...${this.fieldElement.slice(-8)}`;
     }
     
     // Initialize grid with challenge
