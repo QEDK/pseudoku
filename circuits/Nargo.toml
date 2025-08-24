@@ -1,0 +1,4 @@
+[package]
+name = "pseudoku"
+type = "bin"
+authors = ["QEDK <hi@qedk.xyz"]
