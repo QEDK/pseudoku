@@ -5,5 +5,6 @@
     "assets": {
         "directory": "./dist"
     },
-    "send_metrics": false
+    "send_metrics": false,
+   "compatibility_flags": ["nodejs_compat"]
 }
