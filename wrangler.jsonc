@@ -1,0 +1,5 @@
+    {
+      "$schema": "node_modules/wrangler/config-schema.json",
+      "name": "pseudoku-frontend", // Your Worker name
+      "compatibility_date": "2025-04-01", // Or a recent date
+    }

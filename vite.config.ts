@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import { cloudflare } from "@cloudflare/vite-plugin";
 
 export default defineConfig({
   root: '.',
@@ -36,6 +37,7 @@ export default defineConfig({
         Buffer: true,
       },
     }),
+    cloudflare(),
   ],
   server: {
     port: 5173,
