@@ -568,13 +568,6 @@ class PseudokuGame implements Partial<GameState> {
     }
   }
   
-  private formatTime(ms: number): string {
-    const seconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return minutes > 0 ? `${minutes}m ${secs}s` : `${secs}s`;
-  }
-  
   private async copyToClipboard(text: string, buttonId: string): Promise<void> {
     try {
       await navigator.clipboard.writeText(text);
