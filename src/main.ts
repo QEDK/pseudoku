@@ -1,7 +1,6 @@
 import { UltraHonkBackend } from '@aztec/bb.js';
 import { Noir } from '@noir-lang/noir_js';
 import circuit from '../circuits/target/pseudoku.json';
-import { GitHubOAuth } from './utils/githubOauth';
 import type {
   SudokuGrid,
   CellPosition,
@@ -54,60 +53,17 @@ class PseudokuGame implements Partial<GameState> {
   
   private async initializeNoir(): Promise<void> {
     try {
-      console.log('Checking WebAssembly support...');
-      if (typeof WebAssembly === 'undefined') {
-        throw new Error('WebAssembly is not supported in this browser');
-      }
-      
-      // Check for SharedArrayBuffer (needed for multi-threading)
-      const hasSharedArrayBuffer = typeof SharedArrayBuffer !== 'undefined';
-      console.log('SharedArrayBuffer available:', hasSharedArrayBuffer);
-      
       console.log('Initializing Noir...');
       this.noir = new Noir(circuit);
       console.log('Noir instance created');
       
       // Initialize backend with appropriate configuration
       console.log('Initializing UltraHonk backend...');
-      
-      // Use single thread if SharedArrayBuffer is not available
-      const backendOptions = hasSharedArrayBuffer 
-        ? { threads: 4 } 
-        : { threads: 1 };
-      
-      console.log('Backend options:', backendOptions);
-      this.backend = new UltraHonkBackend(circuit.bytecode, backendOptions);
-      console.log('Backend initialized successfully');
-      
-      // Test the initialization with a simple operation
-      console.log('Testing initialization...');
-      const testInputs = {
-        solution: ['0', Array(9).fill(Array(9).fill(1))],
-        challenge: ['0', Array(9).fill(Array(9).fill(1))]
-      };
-      
-      // Just execute to test, don't generate proof
-      await this.noir.execute(testInputs).catch(e => {
-        console.log('Test execution (expected to fail):', e.message);
-      });
-      
-      console.log('Noir and Barretenberg initialized successfully');
+
+      this.backend = new UltraHonkBackend(circuit.bytecode);
+      console.log('Prover backend initialized successfully');
     } catch (error) {
       console.error('Failed to initialize Noir:', error);
-      
-      // Try fallback initialization with single thread
-      if (this.backend === null && error instanceof Error && error.message.includes('SharedArrayBuffer')) {
-        console.log('Attempting fallback initialization with single thread...');
-        try {
-          this.backend = new UltraHonkBackend(circuit.bytecode, { threads: 1 });
-          console.log('Fallback initialization successful');
-        } catch (fallbackError) {
-          console.error('Fallback also failed:', fallbackError);
-          this.showStatus('Failed to initialize proof system. Please check browser compatibility.', 'error');
-        }
-      } else {
-        this.showStatus('Failed to initialize proof system. Please refresh the page.', 'error');
-      }
     }
   }
   
@@ -131,7 +87,9 @@ class PseudokuGame implements Partial<GameState> {
     // Display field element
     const fieldElementText = document.getElementById('fieldElementText');
     if (fieldElementText) {
-      fieldElementText.textContent = `Challenge ID: ${this.fieldElement.slice(0, 10)}...${this.fieldElement.slice(-8)}`;
+      // convert field element to hex
+      const fieldElementHex = BigInt(this.fieldElement).toString(16).padStart(64, '0');
+      fieldElementText.textContent = `Challenge ID: 0x${fieldElementHex.slice(0, 6)}...${fieldElementHex.slice(-6)}`;
     }
     
     // Initialize grid with challenge
@@ -427,7 +385,7 @@ class PseudokuGame implements Partial<GameState> {
     const proofStr = Array.from(proof.slice(0, 32))
       .map(b => b.toString(16).padStart(2, '0'))
       .join('');
-    return `${proofStr.slice(0, 8)}...${proofStr.slice(-8)}`;
+    return `0x${proofStr.slice(0, 6)}...${proofStr.slice(-6)}`;
   }
   
   private async uploadToGist(): Promise<void> {
@@ -445,11 +403,13 @@ class PseudokuGame implements Partial<GameState> {
     }
     
     this.showStatus('Uploading to GitHub Gist...', 'loading');
-    
+
+    let proofHex = Array.from(this.proof.proof)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
     const proofData: ProofDataExport = {
-      challenge: CHALLENGE_PUZZLE,
       challengeId: this.fieldElement,
-      proof: Array.from(this.proof.proof),
+      proof: proofHex,
       publicInputs: this.proof.publicInputs,
       timeInMs: this.proofTime || 0,
       timestamp: new Date().toISOString()
@@ -492,34 +452,49 @@ class PseudokuGame implements Partial<GameState> {
   }
   
   private async postToGitHub(): Promise<void> {
-    const CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || '';
+    // Just open gist.github.com
+    window.open('https://gist.github.com/', '_blank');
     
-    if (!CLIENT_ID) {
-      // Fallback to manual token input
-      this.showStatus('GitHub OAuth not configured. Use manual token instead.', 'info');
-      const manualSection = document.getElementById('manualGistSection');
-      if (manualSection) {
-        manualSection.style.display = 'flex';
-      }
+    // Show the gist URL input section
+    const gistUrlSection = document.getElementById('gistUrlSection');
+    if (gistUrlSection) {
+      gistUrlSection.style.display = 'flex';
+    }
+  }
+  
+  private submitGistUrl(): void {
+    const gistUrlInput = document.getElementById('gistUrlInput') as HTMLInputElement;
+    const url = gistUrlInput?.value.trim();
+    
+    if (!url) {
+      this.showStatus('Please enter a Gist URL', 'error');
       return;
     }
     
-    // Store current proof in sessionStorage temporarily
-    if (this.proof) {
-      const proofData: ProofDataExport = {
-        challenge: CHALLENGE_PUZZLE,
-        challengeId: this.fieldElement,
-        proof: Array.from(this.proof.proof),
-        publicInputs: this.proof.publicInputs,
-        timeInMs: this.proofTime || 0,
-        timestamp: new Date().toISOString()
-      };
-      
-      sessionStorage.setItem('pendingProof', JSON.stringify(proofData));
+    // Validate URL format
+    const gistUrlPattern = /^https:\/\/gist\.github\.com\/([^\/]+)\/([a-f0-9]+)$/i;
+    const match = url.match(gistUrlPattern);
+    
+    if (!match) {
+      this.showStatus('Invalid Gist URL. Format should be: https://gist.github.com/username/id', 'error');
+      return;
     }
     
-    // Use GitHubOAuth class to initiate OAuth flow
-    GitHubOAuth.initiateOAuth(CLIENT_ID);
+    // Set the gist URL
+    this.gistUrl = url;
+    this.showStatus(
+      `Gist URL saved! <a href="${this.gistUrl}" target="_blank">View Gist</a>`,
+      'success'
+    );
+    
+    // Hide the input section
+    const gistUrlSection = document.getElementById('gistUrlSection');
+    if (gistUrlSection) {
+      gistUrlSection.style.display = 'none';
+    }
+    
+    // Clear the input
+    gistUrlInput.value = '';
   }
   
   private async verifyExternalProof(): Promise<void> {
@@ -530,36 +505,52 @@ class PseudokuGame implements Partial<GameState> {
   }
   
   private async performVerification(): Promise<void> {
-    const input = (document.getElementById('proofInput') as HTMLTextAreaElement)?.value;
+    const publicInputsInput = (document.getElementById('publicInputsInput') as HTMLTextAreaElement)?.value;
+    const proofHexInput = (document.getElementById('proofHexInput') as HTMLTextAreaElement)?.value;
     
-    if (!input) {
-      this.showVerifyResult('Please paste proof data', false);
+    if (!publicInputsInput || !proofHexInput) {
+      this.showVerifyResult('Please enter both public inputs and proof hex', false);
       return;
     }
     
     try {
-      const proofData = JSON.parse(input) as ProofDataExport;
+      // Parse public inputs (expecting JSON array of strings)
+      let publicInputs: string[];
+      try {
+        publicInputs = JSON.parse(publicInputsInput);
+        if (!Array.isArray(publicInputs)) {
+          throw new Error('Public inputs must be an array');
+        }
+      } catch (e) {
+        this.showVerifyResult('Invalid public inputs format. Expected JSON array of strings.', false);
+        return;
+      }
+      
+      // Parse proof hex
+      const cleanProofHex = proofHexInput.trim().replace(/^0x/, '').replace(/\s/g, '');
+      if (!/^[0-9a-fA-F]+$/.test(cleanProofHex) || cleanProofHex.length % 2 !== 0) {
+        this.showVerifyResult('Invalid proof hex format', false);
+        return;
+      }
+      
+      const proofArray = new Uint8Array(cleanProofHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
       
       if (!this.backend) {
         this.showVerifyResult('Proof system not initialized', false);
         return;
       }
-      
+
       // Reconstruct proof format for verification
       const proof: ProofData = {
-        proof: new Uint8Array(proofData.proof),
-        publicInputs: proofData.publicInputs
+        proof: proofArray,
+        publicInputs: publicInputs
       };
       
       // Verify the proof
       const isValid = await this.backend.verifyProof(proof);
       
       if (isValid) {
-        const timeStr = this.formatTime(proofData.timeInMs);
-        this.showVerifyResult(
-          `✓ Valid proof! Solved in ${timeStr}. Challenge ID: ${proofData.challengeId.slice(0, 10)}...`,
-          true
-        );
+        this.showVerifyResult('✓ Valid proof!', true);
       } else {
         this.showVerifyResult('✗ Invalid proof', false);
       }
@@ -609,7 +600,9 @@ class PseudokuGame implements Partial<GameState> {
   }
   
   private copyFieldElement(): void {
-    this.copyToClipboard(this.fieldElement, 'copyFieldBtn');
+    // Copy as hex instead of BigInt
+    const fieldElementHex = '0x' + BigInt(this.fieldElement).toString(16).padStart(64, '0');
+    this.copyToClipboard(fieldElementHex, 'copyFieldBtn');
   }
   
   private copyProofData(): void {
@@ -617,11 +610,13 @@ class PseudokuGame implements Partial<GameState> {
       this.showStatus('No proof to copy', 'error');
       return;
     }
-    
+
+    const proofHex = Array.from(this.proof.proof)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
     const proofData: ProofDataExport = {
-      challenge: CHALLENGE_PUZZLE,
       challengeId: this.fieldElement,
-      proof: Array.from(this.proof.proof),
+      proof: proofHex,
       publicInputs: this.proof.publicInputs,
       timeInMs: this.proofTime || 0,
       timestamp: new Date().toISOString()
@@ -638,14 +633,17 @@ class PseudokuGame implements Partial<GameState> {
     
     let message = `I solved today's Pseudoku in ${timeStr}! `;
     
+    // Always include verification line
     if (this.gistUrl) {
-      message += `Verify my proof here: ${this.gistUrl} `;
+      message += `\n\nVerify my proof on GitHub: ${this.gistUrl}`;
+    } else {
+      message += `\n\nVerify my proof on GitHub: <your gist URL>`;
     }
     
-    message += `\n\nSolve a pseudoku at pseudoku.qedk.xyz`;
+    message += `\n\nSolve a pseudoku at https://pseudoku.qedk.xyz`;
     
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
-    window.open(twitterUrl, '_blank');
+    const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(message)}`;
+    window.open(xUrl, '_blank');
   }
   
   private reset(): void {
@@ -663,6 +661,11 @@ class PseudokuGame implements Partial<GameState> {
       const shareSection = document.getElementById('shareSection');
       if (shareSection) {
         shareSection.classList.remove('show');
+      }
+      
+      const gistUrlSection = document.getElementById('gistUrlSection');
+      if (gistUrlSection) {
+        gistUrlSection.style.display = 'none';
       }
       
       const generateProofBtn = document.getElementById('generateProofBtn') as HTMLButtonElement;
@@ -704,63 +707,15 @@ class PseudokuGame implements Partial<GameState> {
     }
   }
   
-  private async handleGitHubCallback(): Promise<void> {
-    // Check if we're returning from GitHub OAuth
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    const state = urlParams.get('state');
-    
-    if (code && state) {
-      try {
-        const token = await GitHubOAuth.handleCallback(code, state);
-        
-        if (token) {
-          // Clean up URL
-          window.history.replaceState({}, document.title, window.location.pathname);
-          
-          // Retrieve and post the pending proof
-          const pendingProof = sessionStorage.getItem('pendingProof');
-          if (pendingProof) {
-            const proofData = JSON.parse(pendingProof) as ProofDataExport;
-            const timeStr = this.formatTime(proofData.timeInMs);
-            
-            const result = await GitHubOAuth.createGist(
-              token,
-              proofData,
-              `Pseudoku Zero-Knowledge Proof - Solved in ${timeStr}`
-            );
-            
-            this.gistUrl = result.url;
-            this.showStatus(
-              `Gist created successfully! <a href="${this.gistUrl}" target="_blank">View Gist</a>`,
-              'success'
-            );
-            
-            sessionStorage.removeItem('pendingProof');
-          }
-        } else {
-          // Fallback to manual token
-          this.showStatus('OAuth failed. Please use manual token instead.', 'error');
-          const manualSection = document.getElementById('manualGistSection');
-          if (manualSection) {
-            manualSection.style.display = 'flex';
-          }
-        }
-      } catch (error) {
-        console.error('OAuth callback error:', error);
-        this.showStatus('OAuth authentication failed', 'error');
-      }
-    }
-  }
-  
   private setupEventListeners(): void {
     const checkBtn = document.getElementById('checkBtn');
     const generateProofBtn = document.getElementById('generateProofBtn');
     const resetBtn = document.getElementById('resetBtn');
     const hintBtn = document.getElementById('hintBtn');
     const uploadGistBtn = document.getElementById('uploadGistBtn');
-    const shareTwitterBtn = document.getElementById('shareTwitterBtn');
+    const shareTwitterBtn = document.getElementById('postXBtn');
     const postGithubBtn = document.getElementById('postGithubBtn');
+    const submitGistUrlBtn = document.getElementById('submitGistUrlBtn');
     const verifyProofBtn = document.getElementById('verifyProofBtn');
     const copyFieldBtn = document.getElementById('copyFieldBtn');
     const copyProofBtn = document.getElementById('copyProofBtn');
@@ -775,6 +730,7 @@ class PseudokuGame implements Partial<GameState> {
     uploadGistBtn?.addEventListener('click', () => this.uploadToGist());
     shareTwitterBtn?.addEventListener('click', () => this.shareOnTwitter());
     postGithubBtn?.addEventListener('click', () => this.postToGitHub());
+    submitGistUrlBtn?.addEventListener('click', () => this.submitGistUrl());
     verifyProofBtn?.addEventListener('click', () => this.verifyExternalProof());
     copyFieldBtn?.addEventListener('click', () => this.copyFieldElement());
     copyProofBtn?.addEventListener('click', () => this.copyProofData());
@@ -790,9 +746,6 @@ class PseudokuGame implements Partial<GameState> {
         modal.classList.remove('show');
       }
     });
-    
-    // Check for GitHub OAuth callback
-    this.handleGitHubCallback();
     
     // Keyboard navigation
     document.addEventListener('keydown', (e: KeyboardEvent) => {

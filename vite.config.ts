@@ -15,7 +15,9 @@ export default defineConfig({
       output: {
         manualChunks: {
           'noir': ['@noir-lang/noir_js'],
-          'bb': ['@aztec/bb.js']
+          'bb': ['@aztec/bb.js'],
+          'noirc_abi': ['@noir-lang/noirc_abi'],
+          'acvm_js': ['@noir-lang/acvm_js'],
         }
       }
     }

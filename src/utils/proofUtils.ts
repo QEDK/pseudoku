@@ -44,14 +44,16 @@ export class ProofUtils {
    */
   static prepareProofExport(
     proof: ProofData,
-    challenge: SudokuGrid,
     challengeId: FieldElement,
     timeInMs: number
   ): ProofDataExport {
+    // convert proof to hex
+    const proofHex = Array.from(proof.proof)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
     return {
-      challenge,
       challengeId,
-      proof: Array.from(proof.proof),
+      proof: proofHex,
       publicInputs: proof.publicInputs,
       timeInMs,
       timestamp: new Date().toISOString()
@@ -139,10 +141,9 @@ export class ProofUtils {
    */
   static sanitizeForPublic(proofData: ProofDataExport): Partial<ProofDataExport> {
     // Remove any potentially sensitive data while keeping proof validity
-    const { challenge, proof, timeInMs, timestamp } = proofData;
+    const { proof, timeInMs, timestamp } = proofData;
     return {
-      challenge,
-      proof: proof.slice(0, 100), // Truncate for display
+      proof,
       timeInMs,
       timestamp
     };

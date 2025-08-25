@@ -12,8 +12,8 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(150deg, #667eef 0%, #664ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -31,6 +31,7 @@
         }
 
         h1 {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             text-align: center;
             color: #333;
             margin-bottom: 10px;
@@ -42,6 +43,7 @@
         }
 
         .subtitle {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             text-align: center;
             color: #666;
             margin-bottom: 30px;
@@ -49,6 +51,7 @@
         }
 
         .timer {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             text-align: center;
             font-size: 1.5rem;
             font-weight: bold;
@@ -70,6 +73,7 @@
         }
 
         .sudoku-cell {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: white;
             border: none;
             text-align: center;
@@ -133,7 +137,9 @@
 
         .sudoku-cell.related {
             background: #f5f5f5;
-        }        .github-token-input {
+        }
+
+        .github-token-input {
             display: flex;
             gap: 10px;
             margin-top: 15px;
@@ -149,6 +155,26 @@
 
         #manualGistSection {
             display: none;
+        }
+
+        #gistUrlSection {
+            display: none;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        #gistUrlSection input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        #gistUrlSection button {
+            flex: none;
+            min-width: 80px;
+            padding: 10px 20px;
         }
 
         .controls {
@@ -232,7 +258,7 @@
         }
 
         .proof-hash {
-            font-family: 'Courier New', monospace;
+            font-family: monospace, 'Courier New';
             font-size: 0.85rem;
             word-break: break-all;
             color: #666;
@@ -256,13 +282,13 @@
             margin-bottom: 15px;
         }
 
-        .share-buttons {
+        .achievement-buttons {
             display: flex;
             gap: 10px;
             margin-bottom: 15px;
         }
 
-        .github-btn, .twitter-btn {
+        .post-gh-btn, .post-x-btn {
             flex: 1;
             display: flex;
             align-items: center;
@@ -276,21 +302,21 @@
             border: none;
         }
 
-        .github-btn {
+        .post-gh-btn {
             background: #24292e;
             color: white;
         }
 
-        .github-btn:hover:not(:disabled) {
+        .post-gh-btn:hover:not(:disabled) {
             background: #1a1e22;
         }
 
-        .twitter-btn {
+        .post-x-btn {
             background: #000000;
             color: white;
         }
 
-        .twitter-btn:hover:not(:disabled) {
+        .post-x-btn:hover:not(:disabled) {
             background: #1a1a1a;
         }
 
@@ -343,12 +369,20 @@
             color: #333;
         }
 
+        .modal label {
+            display: block;
+            margin-bottom: 5px;
+            margin-top: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+
         .modal textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 6px;
-            font-family: 'Courier New', monospace;
+            font-family: monospace, 'Courier New';
             font-size: 0.85rem;
             resize: vertical;
             margin-bottom: 15px;
@@ -380,7 +414,7 @@
         .verify-details {
             margin-top: 10px;
             font-size: 0.85rem;
-            font-family: 'Courier New', monospace;
+            font-family: monospace, 'Courier New';
         }
 
         .field-element {
@@ -388,28 +422,39 @@
             color: #666;
             font-size: 0.85rem;
             margin-bottom: 10px;
-            font-family: 'Courier New', monospace;
+            font-family: monospace, 'Courier New';
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
         }
 
+        /* Smaller copy buttons */
         .copy-btn {
             background: transparent;
             border: 1px solid #ddd;
             border-radius: 4px;
-            padding: 4px 6px;
+            padding: 2px 4px;
             cursor: pointer;
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            min-width: auto;
+            width: 24px;
+            height: 24px;
+        }
+
+        .copy-btn svg {
+            width: 14px;
+            height: 14px;
         }
 
         .copy-btn:hover {
             background: #f0f0f0;
             border-color: #667eea;
+            transform: none;
+            box-shadow: none;
         }
 
         .copy-btn.copied {
@@ -485,7 +530,7 @@
         <div class="field-element" id="fieldElement">
             <span id="fieldElementText"></span>
             <button class="copy-btn" id="copyFieldBtn" title="Copy field element">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2">
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
@@ -511,7 +556,7 @@
             <p>Your solution has been verified with a zero-knowledge proof.</p>
             <div class="proof-hash" id="proofHash"></div>
             <button class="copy-btn-large" id="copyProofBtn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2">
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
@@ -521,19 +566,23 @@
         
         <div class="share-section" id="shareSection">
             <h3>Share Your Achievement</h3>
-            <div class="share-buttons">
-                <button id="postGithubBtn" class="github-btn">
+            <div class="achievement-buttons">
+                <button id="postGithubBtn" class="post-gh-btn">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                     </svg>
-                    Post on GitHub
+                    Upload to GitHub
                 </button>
-                <button id="shareTwitterBtn" class="twitter-btn">
+                <button id="postXBtn" class="post-x-btn">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                     </svg>
-                    Share on X
+                    Post on X
                 </button>
+            </div>
+            <div class="github-token-input" id="gistUrlSection">
+                <input type="text" id="gistUrlInput" placeholder="Enter your Gist URL (e.g. https://gist.github.com/username/id)">
+                <button id="submitGistUrlBtn">Submit</button>
             </div>
             <div class="github-token-input" id="manualGistSection">
                 <input type="password" id="githubToken" placeholder="GitHub Personal Access Token (optional)">
@@ -546,8 +595,13 @@
             <div class="modal-content">
                 <span class="close" id="closeModal">&times;</span>
                 <h2>Verify Proof</h2>
-                <p>Paste proof data to verify its validity:</p>
-                <textarea id="proofInput" placeholder="Paste proof JSON here..." rows="10"></textarea>
+                
+                <label for="publicInputsInput">Public Inputs (JSON array of strings):</label>
+                <textarea id="publicInputsInput" placeholder='["input1", "input2", ...]' rows="4"></textarea>
+                
+                <label for="proofHexInput">Proof (hex format):</label>
+                <textarea id="proofHexInput" placeholder="Enter proof hex (with or without 0x prefix)" rows="8"></textarea>
+                
                 <button id="verifyBtn">Verify</button>
                 <div class="verify-result" id="verifyResult"></div>
             </div>

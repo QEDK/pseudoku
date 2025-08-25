@@ -38,9 +38,8 @@ export interface GistResponse {
 }
 
 export interface ProofDataExport {
-  challenge: SudokuGrid;
-  challengeId: FieldElement;
-  proof: number[];
+  challengeId: string;
+  proof: string;
   publicInputs: string[];
   timeInMs: number;
   timestamp: string;
