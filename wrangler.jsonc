@@ -1,10 +1,9 @@
 {
-    "$schema": "node_modules/wrangler/config-schema.json",
-    "name": "pseudoku-frontend", // Your Worker name
-    "compatibility_date": "2025-04-01", // Or a recent date
-    "assets": {
-        "directory": "./dist"
-    },
-    "send_metrics": false,
-   "compatibility_flags": ["nodejs_compat"]
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pseudoku-frontend",
+  "compatibility_date": "2025-04-01",
+  "assets": {
+    "directory": "./dist"
+  },
+  "send_metrics": false,
 }
