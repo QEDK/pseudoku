@@ -46,7 +46,7 @@ export interface ProofDataExport {
 }
 
 // UI State types
-export type StatusType = 'info' | 'success' | 'error' | 'loading';
+export type StatusType = "info" | "success" | "error" | "loading";
 
 export interface GameState {
   grid: SudokuGrid;
@@ -61,7 +61,7 @@ export interface GameState {
 }
 
 // Noir.js module declaration
-declare module '@noir-lang/noir_js' {
+declare module "@noir-lang/noir_js" {
   export class Noir {
     constructor(circuit: any);
     execute(inputs: any): Promise<WitnessMap>;
@@ -69,7 +69,7 @@ declare module '@noir-lang/noir_js' {
 }
 
 // bb.js module declaration
-declare module '@aztec/bb.js' {
+declare module "@aztec/bb.js" {
   export class UltraHonkBackend {
     constructor(bytecode: string, options?: any);
     generateProof(witness: Uint8Array): Promise<ProofData>;
@@ -78,7 +78,7 @@ declare module '@aztec/bb.js' {
 }
 
 // Circuit JSON module
-declare module '*.json' {
+declare module "*.json" {
   const value: {
     bytecode: string;
     abi: any;

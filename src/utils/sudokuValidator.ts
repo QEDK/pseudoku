@@ -1,4 +1,4 @@
-import type { SudokuGrid } from '../types';
+import type { SudokuGrid } from "../types";
 
 export class SudokuValidator {
   /**
@@ -9,36 +9,51 @@ export class SudokuValidator {
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {
         if (grid[i][j] === 0) {
-          return { valid: false, error: `Cell at row ${i + 1}, column ${j + 1} is empty` };
+          return {
+            valid: false,
+            error: `Cell at row ${i + 1}, column ${j + 1} is empty`,
+          };
         }
         if (grid[i][j] < 1 || grid[i][j] > 9) {
-          return { valid: false, error: `Invalid value at row ${i + 1}, column ${j + 1}` };
+          return {
+            valid: false,
+            error: `Invalid value at row ${i + 1}, column ${j + 1}`,
+          };
         }
       }
     }
 
     // Check rows
     for (let i = 0; i < 9; i++) {
-      if (!this.hasAllDigits(grid[i])) {
-        return { valid: false, error: `Row ${i + 1} contains duplicate values` };
+      if (!SudokuValidator.hasAllDigits(grid[i])) {
+        return {
+          valid: false,
+          error: `Row ${i + 1} contains duplicate values`,
+        };
       }
     }
 
     // Check columns
     for (let j = 0; j < 9; j++) {
-      const column = this.getColumn(grid, j);
-      if (!this.hasAllDigits(column)) {
-        return { valid: false, error: `Column ${j + 1} contains duplicate values` };
+      const column = SudokuValidator.getColumn(grid, j);
+      if (!SudokuValidator.hasAllDigits(column)) {
+        return {
+          valid: false,
+          error: `Column ${j + 1} contains duplicate values`,
+        };
       }
     }
 
     // Check 3x3 boxes
     for (let boxNum = 0; boxNum < 9; boxNum++) {
-      const box = this.getBox(grid, boxNum);
-      if (!this.hasAllDigits(box)) {
+      const box = SudokuValidator.getBox(grid, boxNum);
+      if (!SudokuValidator.hasAllDigits(box)) {
         const boxRow = Math.floor(boxNum / 3) + 1;
         const boxCol = (boxNum % 3) + 1;
-        return { valid: false, error: `Box at position (${boxRow}, ${boxCol}) contains duplicate values` };
+        return {
+          valid: false,
+          error: `Box at position (${boxRow}, ${boxCol}) contains duplicate values`,
+        };
       }
     }
 
@@ -77,7 +92,7 @@ export class SudokuValidator {
     const box: number[] = [];
     const boxRow = Math.floor(boxNum / 3) * 3;
     const boxCol = (boxNum % 3) * 3;
-    
+
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
         box.push(grid[boxRow + i][boxCol + j]);
@@ -93,26 +108,29 @@ export class SudokuValidator {
     grid: SudokuGrid,
     row: number,
     col: number,
-    value: number
-  ): Array<{ type: 'row' | 'column' | 'box'; position: number }> {
-    const conflicts: Array<{ type: 'row' | 'column' | 'box'; position: number }> = [];
-    
+    value: number,
+  ): Array<{ type: "row" | "column" | "box"; position: number }> {
+    const conflicts: Array<{
+      type: "row" | "column" | "box";
+      position: number;
+    }> = [];
+
     // Check row
     for (let j = 0; j < 9; j++) {
       if (j !== col && grid[row][j] === value) {
-        conflicts.push({ type: 'row', position: row });
+        conflicts.push({ type: "row", position: row });
         break;
       }
     }
-    
+
     // Check column
     for (let i = 0; i < 9; i++) {
       if (i !== row && grid[i][col] === value) {
-        conflicts.push({ type: 'column', position: col });
+        conflicts.push({ type: "column", position: col });
         break;
       }
     }
-    
+
     // Check 3x3 box
     const boxRow = Math.floor(row / 3) * 3;
     const boxCol = Math.floor(col / 3) * 3;
@@ -120,19 +138,22 @@ export class SudokuValidator {
       for (let j = boxCol; j < boxCol + 3; j++) {
         if (i !== row && j !== col && grid[i][j] === value) {
           const boxNum = Math.floor(row / 3) * 3 + Math.floor(col / 3);
-          conflicts.push({ type: 'box', position: boxNum });
+          conflicts.push({ type: "box", position: boxNum });
           return conflicts;
         }
       }
     }
-    
+
     return conflicts;
   }
 
   /**
    * Checks if a puzzle matches the challenge (for verification)
    */
-  static matchesChallenge(solution: SudokuGrid, challenge: SudokuGrid): boolean {
+  static matchesChallenge(
+    solution: SudokuGrid,
+    challenge: SudokuGrid,
+  ): boolean {
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {
         if (challenge[i][j] !== 0 && solution[i][j] !== challenge[i][j]) {
@@ -177,6 +198,6 @@ export class SudokuValidator {
    * Deep clones a Sudoku grid
    */
   static cloneGrid(grid: SudokuGrid): SudokuGrid {
-    return grid.map(row => [...row]);
+    return grid.map((row) => [...row]);
   }
 }

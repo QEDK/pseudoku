@@ -1,4 +1,4 @@
-import type { SudokuGrid } from '../types';
+import type { SudokuGrid } from "../types";
 
 // Challenge puzzles
 export const CHALLENGE_PUZZLES: Record<string, SudokuGrid> = {
@@ -65,52 +65,54 @@ export const GRID = {
 
 // Keyboard Navigation
 export const KEYBOARD_KEYS = {
-  ARROW_UP: 'ArrowUp',
-  ARROW_DOWN: 'ArrowDown',
-  ARROW_LEFT: 'ArrowLeft',
-  ARROW_RIGHT: 'ArrowRight',
-  ENTER: 'Enter',
-  BACKSPACE: 'Backspace',
-  DELETE: 'Delete',
-  ESCAPE: 'Escape',
-  TAB: 'Tab',
+  ARROW_UP: "ArrowUp",
+  ARROW_DOWN: "ArrowDown",
+  ARROW_LEFT: "ArrowLeft",
+  ARROW_RIGHT: "ArrowRight",
+  ENTER: "Enter",
+  BACKSPACE: "Backspace",
+  DELETE: "Delete",
+  ESCAPE: "Escape",
+  TAB: "Tab",
 } as const;
 
 // API Endpoints
 export const API = {
-  GITHUB_GIST: 'https://api.github.com/gists',
-  TWITTER_INTENT: 'https://twitter.com/intent/tweet',
+  GITHUB_GIST: "https://api.github.com/gists",
+  TWITTER_INTENT: "https://twitter.com/intent/tweet",
 } as const;
 
 // Messages
 export const MESSAGES = {
   ERRORS: {
-    EMPTY_CELLS: 'Please fill in all cells',
-    INVALID_VALUE: 'Only numbers 1-9 are allowed',
+    EMPTY_CELLS: "Please fill in all cells",
+    INVALID_VALUE: "Only numbers 1-9 are allowed",
     DUPLICATE_ROW: (row: number) => `Row ${row + 1} contains duplicate values`,
-    DUPLICATE_COLUMN: (col: number) => `Column ${col + 1} contains duplicate values`,
+    DUPLICATE_COLUMN: (col: number) =>
+      `Column ${col + 1} contains duplicate values`,
     DUPLICATE_BOX: (box: number) => `Box ${box + 1} contains duplicate values`,
-    PROOF_INIT_FAILED: 'Failed to initialize proof system. Please refresh the page.',
-    PROOF_GENERATION_FAILED: 'Error generating proof. Please try again.',
-    PROOF_VERIFICATION_FAILED: 'Proof verification failed. Please try again.',
-    NO_GITHUB_TOKEN: 'Please enter a GitHub Personal Access Token',
-    NO_PROOF: 'No proof to upload. Generate a proof first.',
-    GIST_UPLOAD_FAILED: 'Failed to create gist',
+    PROOF_INIT_FAILED:
+      "Failed to initialize proof system. Please refresh the page.",
+    PROOF_GENERATION_FAILED: "Error generating proof. Please try again.",
+    PROOF_VERIFICATION_FAILED: "Proof verification failed. Please try again.",
+    NO_GITHUB_TOKEN: "Please enter a GitHub Personal Access Token",
+    NO_PROOF: "No proof to upload. Generate a proof first.",
+    GIST_UPLOAD_FAILED: "Failed to create gist",
   },
   SUCCESS: {
-    SOLUTION_CORRECT: 'Solution is correct! You can now generate a proof.',
-    PROOF_GENERATED: 'Proof generated and verified successfully!',
-    GIST_CREATED: 'Gist created successfully!',
-    GAME_RESET: 'Game reset. Good luck!',
+    SOLUTION_CORRECT: "Solution is correct! You can now generate a proof.",
+    PROOF_GENERATED: "Proof generated and verified successfully!",
+    GIST_CREATED: "Gist created successfully!",
+    GAME_RESET: "Game reset. Good luck!",
   },
   INFO: {
-    GENERATING_PROOF: 'Generating proof... This may take a moment.',
-    UPLOADING_GIST: 'Uploading to GitHub Gist...',
-    NO_EMPTY_CELLS: 'No empty cells to fill!',
-    HINT: 'Try using the process of elimination for empty cells.',
+    GENERATING_PROOF: "Generating proof... This may take a moment.",
+    UPLOADING_GIST: "Uploading to GitHub Gist...",
+    NO_EMPTY_CELLS: "No empty cells to fill!",
+    HINT: "Try using the process of elimination for empty cells.",
   },
   CONFIRM: {
-    RESET: 'Are you sure you want to reset? Your progress will be lost.',
+    RESET: "Are you sure you want to reset? Your progress will be lost.",
   },
 } as const;
 
@@ -118,6 +120,6 @@ export const MESSAGES = {
 export const DEFAULTS = {
   FIELD_ELEMENT_BYTES: 32,
   PROOF_DISPLAY_BYTES: 32,
-  GIST_DESCRIPTION_PREFIX: 'Pseudoku Zero-Knowledge Proof - Solved in',
-  SHARE_MESSAGE_SUFFIX: 'Solve a pseudoku at pseudoku.qedk.xyz',
+  GIST_DESCRIPTION_PREFIX: "Pseudoku Zero-Knowledge Proof - Solved in",
+  SHARE_MESSAGE_SUFFIX: "Solve a pseudoku at pseudoku.qedk.xyz",
 } as const;
